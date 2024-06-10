@@ -19,6 +19,10 @@ AlwaysBreakTemplateDeclarations: true # deprecated after 19
 # Classes
 
 BreakConstructorInitializers: AfterColon
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
 
 # Spaces
 

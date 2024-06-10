@@ -23,7 +23,8 @@ void LengthDistribution::update(const size_t value)
                                               : Category::GEQ_1519;
     // NOLINTEND(readability-avoid-nested-conditional-operator)
 
-    if (_counters[category] == std::numeric_limits<size_t>::max())
+    if (_counters.contains(category) &&
+        _counters[category] == std::numeric_limits<size_t>::max())
         return;
 
     ++_counters[category];

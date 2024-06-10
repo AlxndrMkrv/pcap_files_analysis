@@ -19,17 +19,29 @@ add_executable(${PROJECT_NAME} src/main.cxx
                                src/Parser.hxx
                                src/Parser.cxx
                                src/Packet/Base.hxx
+                               src/Packet/Base.cxx
+                               src/Packet/IPv4.hxx
+                               src/Packet/IPv6.hxx
+                               src/Packet/IPv6.cxx
+                               src/Packet/ICMP.hxx
+                               src/Packet/ICMPv6.hxx
                                src/Packet/Ethernet.hxx
                                src/Packet/Ethernet.cxx
                                src/Packet/L2.hxx
                                src/Packet/L3.hxx
                                src/Packet/L4.hxx
-                               src/Packet/Tcp.hxx
+                               src/Packet/TCP.hxx
+                               src/Packet/TCP.cxx
+                               src/Packet/UDP.hxx
                                src/Statistics/_Common.hxx
                                src/Statistics/UniqueFields.hxx
                                src/Statistics/UniqueFields.cxx
                                src/Statistics/LengthDistribution.hxx
                                src/Statistics/LengthDistribution.cxx
+                               src/Statistics/L3Distribution.hxx
+                               src/Statistics/L3Distribution.cxx
+                               src/Statistics/L4Distribution.hxx
+                               src/Statistics/L4Distribution.cxx
                                src/Statistics/TcpFlags.hxx
                                src/Statistics/TcpFlags.cxx
                                src/Statistics/Report.hxx

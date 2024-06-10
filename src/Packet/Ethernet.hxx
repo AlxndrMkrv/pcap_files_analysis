@@ -1,75 +1,48 @@
 #pragma once
 
-#include "L2.hxx"
+#include "Base.hxx"
 
-namespace Packet {
+namespace Ethernet {
 
-/*struct L2 {
-    enum class FrameType { Unknown, Ethernet };
+struct Address : ::Packet::Address<6> {};
 
-    L2(std::span<uint8_t> data, FrameType type) : _data(data), _frameType(type)
-    {
-    }
-
-    virtual const L3 * const payload() const;
-
-private:
-    std::span<uint8_t> _data;
-    FrameType _frameType = FrameType::Unknown;
+struct Header {
+    Address Destination;
+    Address Source;
+    uint16_t EtherType;
 };
 
-struct ARP {};
+struct VlanHeader : public Header {
+    uint16_t : 16;
+    uint16_t VlanEtherType;
+};
 
-struct IPv4 {};
-struct IPv6 {};*/
+namespace EtherType {
+enum Type {
+    IPV4 = 0x0800,
+    VLAN = 0x8100,
+    IPV6 = 0x86DD,
+};
+}
 
-struct Ethernet : public L2 {
+class Packet : public ::Packet::Base<VlanHeader> {
+    static_assert(sizeof(Header) == 14 && sizeof(VlanHeader) == 18);
 
-    struct Mac {
-        static constexpr size_t Size = 6;
-        struct Compare {
-            bool operator()(const Mac & lhs, const Mac & rhs)
-            {
-                return lhs < rhs;
-            };
-        };
-
-        uint8_t operator[](const size_t idx) const { return octets[idx]; }
-        auto operator<=>(const Mac & other) const = default;
-        const uint8_t octets[Size];
-    };
-
-    uint16_t type() const { return _data[16]; }
-
-    enum class Offset : int16_t {
-        DESTINATION = 0,
-        SOURCE = 6,
-        ETHER_TYPE = 12,
-        CRC = -4
-    };
-
+public:
     static constexpr size_t MinimalSize = 64;
-    static constexpr uint16_t VlanTpid = 0x8100;
 
-    Ethernet(const std::span<const uint8_t> data);
+    Packet(const std::span<const uint8_t> data);
+
+    bool isSane() const override;
+    bool isChecksumOk() const override;
+    std::span<const uint8_t> payload() const override;
+
+    uint16_t etherType() const;
+    Address source() const;
+    Address destination() const;
 
 protected:
-    const Mac & destination;
-    const Mac & source;
-    /*protected:
-        std::span<uint8_t, 6> _data;
-        };
-
-    protected:
-        explicit Ethernet(std::span<const uint8_t> data) :
-            L2(data), sourceMac{_data.data()}
-        {
-        }
-
-        const uint8_t (&sourceMac)[6];
-        const uint8_t (&destinationMac)[6];
-        const uint16_t & type;
-        const uint8_t (&checksum)[4];*/
+    const uint32_t & _checksum;
 };
 
-} // namespace Packet
+} // namespace Ethernet

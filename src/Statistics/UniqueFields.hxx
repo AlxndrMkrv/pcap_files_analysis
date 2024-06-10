@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Packet/Ethernet.hxx"
+#include "Packet/IPv4.hxx"
+#include "Packet/IPv6.hxx"
+#include "Packet/TCP.hxx"
+#include "Packet/UDP.hxx"
 #include "_Common.hxx"
 #include <cstddef>
 #include <iostream>
@@ -12,28 +16,24 @@ namespace Statistics {
 
 class UniqueFields {
 public:
-    /*struct ISet {
-        virtual void
-    }
-
-    template <class T>
-    struct Set : public std::set<T> {
-        size_t value
-    };*/
-
     enum class Category : size_t {
         SOURCE_MAC,
         DESTINATION_MAC,
-        SOURCE_IP4,
-        DESTINATION_IP4,
-        SOURCE_IP6,
-        DESTINATION_IP6,
+        SOURCE_IPV4,
+        DESTINATION_IPV4,
+        SOURCE_IPV6,
+        DESTINATION_IPV6,
         SOURCE_PORT,
         DESTINATION_PORT
     };
 
-    void update(const Packet::Ethernet::Mac & sourceMac,
-                const Packet::Ethernet::Mac & destMac);
+    UniqueFields();
+
+    void update(const Ethernet::Packet & packet);
+    void update(const IPv4::Packet & packet);
+    void update(const IPv6::Packet & packet);
+    void update(const TCP::Packet & packet);
+    void update(const UDP::Packet & packet);
     size_t value(const Category c) const;
 
     friend std::ostream & operator<<(std::ostream & os,
@@ -43,8 +43,11 @@ private:
     // template <class T>
     // auto & getSet(const Category c);
 
-    std::unordered_map<Category, std::variant<std::set<Packet::Ethernet::Mac>>,
-                       EnumHash<Category>>
+    std::unordered_map<
+        Category,
+        std::variant<std::set<Ethernet::Address>, std::set<IPv4::Address>,
+                     std::set<IPv6::Address>, std::set<uint16_t>>,
+        EnumHash<Category>>
         _counters;
 };
 

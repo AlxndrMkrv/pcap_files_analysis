@@ -11,16 +11,57 @@ void Report::markInvalid() { _fileInvalid = true; }
 
 const std::string & Report::filename() const { return _filename; }
 
-void Report::analysePacket(std::span<const uint8_t> data)
+void Report::analysePacket(const std::span<const uint8_t> data)
 {
     ++_nPackets;
     _nBytes += data.size();
 
     _lengthDistribution.update(data.size());
 
-    if (data.size() <= Packet::Ethernet::MinimalSize)
+    Ethernet::Packet eth{data};
+
+    if (!pkt.isSane())
         return;
+
+    _l3Distribution.update(eth.etherType());
+
+    switch (eth.etherType()) {
+    case Ethernet::EtherType::IPV4:
+        analyseIPv4(eth.payload());
+        break;
+    case Ethernet::EtherType::IPV6:
+        analyseIPv6(eth.payload());
+        break;
+    default:
+    }
 }
+
+void Report::analyseIPv4(const std::span<const uint8_t> data)
+{
+    IPv4::Packet pkt{data};
+
+    if (!pkt.isSane())
+        return;
+
+    switch (pkt.protocol())
+    case IPv4::Protocol::TCP:
+        analyseTcp(pkt.payload());
+    break;
+case IPv4::Protocol::UDP:
+    analyseUdp(pkt.payload());
+    break;
+case IPv4::Protocol::ICMP:
+    analyseIcmp(pkt.payload());
+    break;
+}
+
+void Report::analyseIPv6(const std::span<const uint8_t> data) {}
+
+void Report::analyseICMP(const std::span<const uint8_t> data) {}
+
+void Report::analyseTCP(const std::span<const uint8_t> data) {}
+
+void Report::analyseUDP(const std::span<const uint8_t> data) {}
 
 std::ostream & operator<<(std::ostream & os, const Report & obj)
 {
@@ -34,16 +75,8 @@ std::ostream & operator<<(std::ostream & os, const Report & obj)
        << std::endl
        << std::format("{}Total number of bytes: {}", ItemIndent, obj._nBytes)
        << std::endl
-       << obj._lengthDistribution
-       //<< std::format("{}L3 packets distribution:", ItemIndent)
-       /*<< obj._l3*/
-       //<< std::format("{}L4 packets distribution:", ItemIndent)
-       /* << obj._l4*/
-       //<< std::endl
-       << obj._uniqueFields
-       << std::endl
-       //<< std::format("{}TCP packets distribution by flags:", ItemIndent)
-       /* << obj._tcpFlags*/
+       << obj._lengthDistribution << obj._l3Distribution << obj._l4Distribution
+       << obj._uniqueFields << obj._tcpFlags
        << std::format("{}Packets with valid checksum: {}", ItemIndent,
                       obj._nValidChecksums)
        << std::endl
