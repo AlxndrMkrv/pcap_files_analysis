@@ -93,7 +93,6 @@ void Parser::parse(Report & report)
     int retValue = 0;
     size_t idx = 0;
 
-    std::cout << std::format("File: \"{}\"", report.filename()) << std::endl;
     while ((retValue = pcap_next_ex(handle, &header, &data)) >= 0) {
         ++idx;
         if (header->caplen != header->len) {
@@ -104,8 +103,6 @@ void Parser::parse(Report & report)
                       << std::endl;
             continue;
         }
-        std::cout << std::format("pcap: {}: {}", idx, header->caplen)
-                  << std::endl;
         report.analysePacket({data, header->caplen});
     }
 

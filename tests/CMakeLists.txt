@@ -20,4 +20,5 @@ add_test_("IPv4" testIPv4.cxx DEPS packets checksums)
 add_test_("IPv6" testIPv6.cxx DEPS packets checksums)
 add_test_("TCP" testTCP.cxx DEPS packets checksums)
 add_test_("ICMP" testICMP.cxx DEPS packets checksums)
+add_test_("UDP" testUDP.cxx DEPS packets checksums)
 

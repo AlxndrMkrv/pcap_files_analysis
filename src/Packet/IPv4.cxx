@@ -37,10 +37,6 @@ Address Packet::destination() const { return _header.Destination; }
 
 bool Packet::isSane() const
 {
-    const size_t tl = totalLength();
-    const size_t hs = headerSize();
-    const size_t ver = version();
-
     if (_data.size() < sizeof(Header) || _data.size() < headerSize() ||
         _data.size() < totalLength() || version() != 4)
         return false;
@@ -50,7 +46,7 @@ bool Packet::isSane() const
 
 bool Packet::isChecksumOk() const
 {
-    return Checksum::RFC1071(_data.subspan(0, headerSize())).isOk();
+    return Checksum::RFC1071{_data.subspan(0, headerSize())}.isOk();
 }
 
 BytesSpan Packet::payload() const

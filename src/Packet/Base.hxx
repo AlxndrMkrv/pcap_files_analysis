@@ -22,12 +22,12 @@ struct Address {
 
     auto operator<=>(const Address & other) const = default;
 
-    operator const BytesSpan() const
+    operator BytesSpan() const
     {
         return BytesSpan{reinterpret_cast<const uint8_t *>(this), _Size};
     }
 
-    uint8_t octets[_Size];
+    std::array<uint8_t, _Size> octets = {};
 };
 
 class Abstract {
@@ -35,6 +35,8 @@ class Abstract {
     friend class Base;
 
 public:
+    virtual ~Abstract() = default;
+
     virtual bool isSane() const = 0;
     virtual bool isChecksumOk() const = 0;
     virtual BytesSpan payload() const = 0;
@@ -68,7 +70,7 @@ protected:
             const auto line =
                 _data.subspan(r, std::min(bytesInLine, _data.size() - r));
 
-            if (!line.size())
+            if (line.empty())
                 return;
 
             os << std::format("{:04x}: ", r);

@@ -44,13 +44,19 @@ set(CLANG_TIDY_ARGS
     modernize-use-bool-literals
     perfomance-*
     readability-*
+    -bugprone-reserved-identifier
+    -cppcoreguidelines-avoid-magic-numbers
+    -cppcoreguidelines-non-private-member-variables-in-classes
+    -cppcoreguidelines-pro-type-reinterpret-cast
+    -cppcoreguidelines-special-member-functions
+    -readability-avoid-const-params-in-decls
     -readability-braces-around-statements
-    #-bugprone-reserved-identifier
-    #-cert-dcl37-c
-    #-cert-dcl51-cpp
-    #-misc-include-cleaner
-    #-readability-identifier-length
-    #-readability-avoid-const-params-in-decls
+    -readability-identifier-length
+    -readability-magic-numbers
+    -readability-simplify-boolean-expr
+    -misc-include-cleaner
+    -cert-dcl37-c
+    -cert-dcl51-cpp
 )
 
 # convert the list to the comma-separated string

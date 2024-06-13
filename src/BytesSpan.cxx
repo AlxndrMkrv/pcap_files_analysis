@@ -1,7 +1,13 @@
 #include "BytesSpan.hxx"
+#include <algorithm>
 
 BytesSpan::BytesSpan(std::span<Underlying> && span) :
-    ::std::span<Underlying>(span)
+    ::std::span<Underlying>{std::move(span)}
+{
+}
+
+BytesSpan::BytesSpan(const std::span<Underlying> & span) :
+    ::std::span<Underlying>{span}
 {
 }
 
@@ -12,8 +18,3 @@ bool BytesSpan::operator==(const BytesSpan & other) const
 
     return std::equal(begin(), end(), other.begin());
 }
-
-/*BytesSpan BytesSpan::subspan(size_t offset, size_t size) const
-{
-    return std::span<Underlying>::subspan(offset, size);
-}*/

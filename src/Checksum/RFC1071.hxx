@@ -5,8 +5,8 @@
 namespace Checksum {
 class RFC1071 {
 public:
-    RFC1071(const uint16_t initial = 0);
-    RFC1071(const BytesSpan & data);
+    explicit RFC1071(const uint16_t initial = 0);
+    explicit RFC1071(const BytesSpan & data);
 
     RFC1071 & operator+=(const BytesSpan & data);
 

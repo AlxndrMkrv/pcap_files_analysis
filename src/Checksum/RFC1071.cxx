@@ -5,7 +5,7 @@ namespace Checksum {
 
 RFC1071::RFC1071(const uint16_t initial) : _sum(initial) {}
 
-RFC1071::RFC1071(const BytesSpan & data) : _sum(0) { operator+=(data); }
+RFC1071::RFC1071(const BytesSpan & data) { operator+=(data); }
 
 RFC1071 & RFC1071::operator+=(const BytesSpan & data)
 {
@@ -28,7 +28,7 @@ RFC1071 & RFC1071::operator+=(const BytesSpan & data)
         _sum += data.back();
 
     // Fold the sum to an uint16_t number
-    while (_sum >> std::numeric_limits<uint16_t>::digits)
+    while (static_cast<bool>(_sum >> std::numeric_limits<uint16_t>::digits))
         _sum = (_sum & std::numeric_limits<uint16_t>::max()) +
                (_sum >> std::numeric_limits<uint16_t>::digits);
 

@@ -33,9 +33,9 @@ struct PseudoHeader {
 
 namespace Protocol {
 enum { ICMP = 0x01, TCP = 0x06, UDP = 0x11, ICMP6 = 58 };
-}
+} // namespace Protocol
 
-class Packet : public ::Packet::Base<Header> {
+class Packet : public virtual ::Packet::Base<Header> {
     static_assert(sizeof(Header) == 5 * sizeof(uint32_t) &&
                   sizeof(PseudoHeader) == 3 * sizeof(uint32_t));
 
