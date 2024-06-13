@@ -11,12 +11,6 @@
 
 static constexpr char FileExtension[] = ".pcap";
 
-/* packets:
- * Ethernet, Unknown
- * IPv4, IPv6, other
- * TCP, UDP, ICMP, ICMPv6, other
- * */
-
 namespace fs = std::filesystem;
 
 constexpr void terminate(const std::string_view message, const int exitCode = 0)
@@ -46,9 +40,13 @@ int main(int argc, char * argv[])
             entry.path().extension() == FileExtension)
             filenames.emplace(fs::relative(entry.path(), directory));
 
+#ifndef __SINGLE_THREAD
     Parser parser(directory.string(),
                   std::min<size_t>(filenames.size(),
                                    std::thread::hardware_concurrency()));
+#else
+    Parser parser(directory.string(), 1);
+#endif
 
     parser.process(std::move(filenames));
 

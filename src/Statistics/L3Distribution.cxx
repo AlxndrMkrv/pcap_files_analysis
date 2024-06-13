@@ -5,12 +5,11 @@ namespace Statistics {
 
 void L3Distribution::update(const uint16_t etherType)
 {
-    using EtherType = Packet::Ethernet::EtherType;
+    namespace EtherType = Ethernet::EtherType;
 
-    const Category category =
-        etherType == std::to_underlying(EtherType::IPV4)   ? Category::IPV4
-        : etherType == std::to_underlying(EtherType::IPV6) ? Category::IPV6
-                                                           : Category::OTHER;
+    const Category category = etherType == EtherType::IPV4   ? Category::IPV4
+                              : etherType == EtherType::IPV6 ? Category::IPV6
+                                                             : Category::OTHER;
 
     if (_counters.contains(category) &&
         _counters[category] == std::numeric_limits<size_t>::max())

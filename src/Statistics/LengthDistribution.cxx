@@ -1,14 +1,5 @@
 #include "LengthDistribution.hxx"
 #include <format>
-#include <ranges>
-#include <utility>
-
-constexpr inline auto EnumRange = [](const auto front, const auto back) {
-    return std::views::iota(std::to_underlying(front),
-                            std::to_underlying(back) + 1) |
-           std::views::transform(
-               [](const auto e) { return decltype(front)(e); });
-};
 
 namespace Statistics {
 

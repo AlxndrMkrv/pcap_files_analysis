@@ -5,13 +5,14 @@ namespace Statistics {
 
 void L4Distribution::update(const uint8_t protocol)
 {
-    using Proto = Packet::IPv4::Protocol;
+    namespace Proto = IPv4::Protocol;
 
     const Category category =
-        protocol == std::to_underlying(Proto::TCP)    ? Category::TCP
-        : protocol == std::to_underlying(Proto::UDP)  ? Category::UDP
-        : protocol == std::to_underlying(Proto::ICMP) ? Category::ICMP
-                                                      : Category::OTHER;
+        protocol == Proto::TCP   ? Category::TCP
+        : protocol == Proto::UDP ? Category::UDP
+        : (protocol == Proto::ICMP || protocol == Proto::ICMP6)
+            ? Category::ICMP
+            : Category::OTHER;
 
     if (_counters.contains(category) &&
         _counters[category] == std::numeric_limits<size_t>::max())

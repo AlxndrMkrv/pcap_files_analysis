@@ -8,13 +8,13 @@ namespace IPv4 {
 struct Address : ::Packet::Address<4> {};
 
 struct Header {
-    uint32_t Version        : 4;
-    uint32_t IHL            : 4;
-    uint32_t                : 8;
-    uint32_t TotalLength    : 16;
-    uint32_t Identification : 16;
-    uint32_t Flags          : 3;
-    uint32_t FragmentOffset : 13;
+    uint8_t Version : 4;
+    uint8_t IHL     : 4;
+    uint8_t         : 8;
+    uint16_t TotalLength;
+    uint16_t Identification;
+    uint16_t Flags          : 3;
+    uint16_t FragmentOffset : 13;
     uint8_t TimeToLive;
     uint8_t Protocol;
     uint16_t HeaderChecksum;
@@ -22,23 +22,40 @@ struct Header {
     Address Destination;
 };
 
+// Header to pass to TCP/UDP packets
+struct PseudoHeader {
+    Address Source;
+    Address Destination;
+    uint16_t          : 8;
+    uint16_t Protocol : 8;
+    uint16_t Length;
+};
+
 namespace Protocol {
-enum { ICMP = 1, TCP = 16, UDP = 17 };
+enum { ICMP = 0x01, TCP = 0x06, UDP = 0x11, ICMP6 = 58 };
 }
 
 class Packet : public ::Packet::Base<Header> {
-    static_assert(sizeof(Header) == 20);
+    static_assert(sizeof(Header) == 5 * sizeof(uint32_t) &&
+                  sizeof(PseudoHeader) == 3 * sizeof(uint32_t));
 
 public:
-    using Base<Header>::Base;
+    explicit Packet(const BytesSpan data);
 
-    bool isSane() const override;
-    bool isChecksumOk() const override;
-    std::span<const uint8_t> payload() const override;
-
+    const Header & header() const;
+    PseudoHeader pseudoHeader() const;
+    uint8_t version() const;
+    uint16_t headerSize() const;
+    uint16_t totalLength() const;
     uint8_t protocol() const;
     Address source() const;
     Address destination() const;
+
+    /* ::Packet::Base<Header> implementation */
+    bool isSane() const override;
+    bool isChecksumOk() const override;
+    BytesSpan payload() const override;
+    void print(std::ostream & os) const override;
 };
 
 } // namespace IPv4

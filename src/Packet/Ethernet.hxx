@@ -29,17 +29,17 @@ class Packet : public ::Packet::Base<VlanHeader> {
     static_assert(sizeof(Header) == 14 && sizeof(VlanHeader) == 18);
 
 public:
-    static constexpr size_t MinimalSize = 64;
-
-    Packet(const std::span<const uint8_t> data);
-
-    bool isSane() const override;
-    bool isChecksumOk() const override;
-    std::span<const uint8_t> payload() const override;
+    explicit Packet(const BytesSpan data);
 
     uint16_t etherType() const;
     Address source() const;
     Address destination() const;
+
+    /* ::Packet::Base<Header> implementation */
+    bool isSane() const override;
+    bool isChecksumOk() const override;
+    BytesSpan payload() const override;
+    void print(std::ostream & os) const override;
 
 protected:
     const uint32_t & _checksum;

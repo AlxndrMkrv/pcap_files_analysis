@@ -5,12 +5,13 @@ namespace Statistics {
 namespace {
 namespace Masks {
 enum {
-    SYN = 0b01000000,
-    SYN_ACK = 0b01001000,
-    ACK = 0b00001000,
-    FIN_ACK = 0b10001000,
-    RST = 0b00100000,
-    RST_ACK = 0b001010000
+    // Dirty workaround
+    SYN = 0b00000010,     // 0b01000000,
+    SYN_ACK = 0b00010010, // 0b01001000,
+    ACK = 0b00010000,     // 0b00001000,
+    FIN_ACK = 0b00010001, // 0b10001000,
+    RST = 0b00000100,     // 0b00100000,
+    RST_ACK = 0b000010100 // 0b001010000
 };
 } // namespace Masks
 } // namespace

@@ -22,7 +22,7 @@ BreakConstructorInitializers: AfterColon
 AlignConsecutiveBitFields:
   Enabled: true
   AcrossEmptyLines: true
-  AcrossComments: false
+  AcrossComments: true
 
 # Spaces
 

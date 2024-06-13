@@ -40,9 +40,6 @@ public:
                                      const UniqueFields & obj);
 
 private:
-    // template <class T>
-    // auto & getSet(const Category c);
-
     std::unordered_map<
         Category,
         std::variant<std::set<Ethernet::Address>, std::set<IPv4::Address>,

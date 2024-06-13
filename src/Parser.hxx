@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Statistics/Report.hxx"
+#include "Report.hxx"
 #include <condition_variable>
 #include <queue>
 #include <stop_token>
@@ -14,7 +14,7 @@ class Parser {
 
 public:
     using Filenames = std::queue<std::string>;
-    using Reports = std::deque<Statistics::Report>;
+    using Reports = std::deque<Report>;
 
     explicit Parser(
         const std::string_view directory,
@@ -38,7 +38,7 @@ public:
     Reports && results();
 
 private:
-    void parse(Statistics::Report & report);
+    void parse(Report & report);
     void threadLoop(const std::stop_token token);
 
     Filenames _files;

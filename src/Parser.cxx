@@ -48,7 +48,7 @@ Parser::Reports && Parser::results()
 
 void Parser::threadLoop(const std::stop_token token)
 {
-    Statistics::Report * report = nullptr;
+    Report * report = nullptr;
 
     while (!token.stop_requested()) {
         {
@@ -75,7 +75,7 @@ void Parser::threadLoop(const std::stop_token token)
     }
 }
 
-void Parser::parse(Statistics::Report & report)
+void Parser::parse(Report & report)
 {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t * handle = pcap_open_offline(
@@ -91,9 +91,23 @@ void Parser::parse(Statistics::Report & report)
     size_t packetCount = 0;
     size_t byteCount = 0;
     int retValue = 0;
+    size_t idx = 0;
 
-    while ((retValue = pcap_next_ex(handle, &header, &data)) >= 0)
-        report.analysePacket({data, header->len});
+    std::cout << std::format("File: \"{}\"", report.filename()) << std::endl;
+    while ((retValue = pcap_next_ex(handle, &header, &data)) >= 0) {
+        ++idx;
+        if (header->caplen != header->len) {
+            std::cerr << std::format("{}: skipping packet No. {}. {} bytes of "
+                                     "{} are not captured",
+                                     report.filename(), idx,
+                                     header->len - header->caplen, header->len)
+                      << std::endl;
+            continue;
+        }
+        std::cout << std::format("pcap: {}: {}", idx, header->caplen)
+                  << std::endl;
+        report.analysePacket({data, header->caplen});
+    }
 
     if (retValue != PCAP_ERROR_BREAK)
         report.markInvalid();
