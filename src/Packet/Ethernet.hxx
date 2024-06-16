@@ -23,7 +23,7 @@ enum Type {
     VLAN = 0x8100,
     IPV6 = 0x86DD,
 };
-}
+} // namespace EtherType
 
 class Packet : public ::Packet::Base<VlanHeader> {
     static_assert(sizeof(Header) == 14 && sizeof(VlanHeader) == 18);

@@ -4,30 +4,44 @@
 #include <algorithm>
 #include <cstdint>
 #include <format>
+#include <initializer_list>
 #include <iostream>
 #include <span>
 
 namespace Packet {
 
 template <size_t _Size>
-struct Address {
+class Address : public std::array<uint8_t, _Size> {
+public:
     static constexpr size_t Size() { return _Size; }
 
     struct Compare {
-        bool operator()(const Address & lhs, const Address & rhs)
+        bool operator()(const Address & lhs, const Address & rhs) const
         {
             return lhs < rhs;
         };
     };
 
+    using std::array<uint8_t, _Size>::array;
+    Address(std::initializer_list<uint8_t> list)
+    {
+        std::copy(list.begin(), list.end(), this->begin());
+    }
+
     auto operator<=>(const Address & other) const = default;
 
-    operator BytesSpan() const
+    /*operator BytesSpan() const
     {
         return BytesSpan{reinterpret_cast<const uint8_t *>(this), _Size};
     }
 
-    std::array<uint8_t, _Size> octets = {};
+    operator const BytesSpan() const
+    {
+        return BytesSpan{reinterpret_cast<const uint8_t *>(this), _Size};
+    }*/
+
+private:
+    // std::array<uint8_t, _Size> _octets = {};
 };
 
 class Abstract {

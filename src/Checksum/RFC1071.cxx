@@ -1,9 +1,12 @@
 #include "RFC1071.hxx"
 #include <limits>
+#include <numeric>
 
 namespace Checksum {
 
 RFC1071::RFC1071(const uint16_t initial) : _sum(initial) {}
+
+// RFC1071::RFC1071(BytesSpan data) { operator+=(data); }
 
 RFC1071::RFC1071(const BytesSpan & data) { operator+=(data); }
 
@@ -20,8 +23,7 @@ RFC1071 & RFC1071::operator+=(const BytesSpan & data)
         data.size() / sizeof(uint16_t));
 
     // Sum up all the words one by one
-    for (const auto & w : wordSpan)
-        _sum += w;
+    _sum = std::accumulate(wordSpan.begin(), wordSpan.end(), _sum);
 
     // Add the last byte if the length is odd
     if (data.size() % sizeof(uint16_t) == 1)

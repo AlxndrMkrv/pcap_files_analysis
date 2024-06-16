@@ -46,7 +46,7 @@ bool Packet::isSane() const
 
 bool Packet::isChecksumOk() const
 {
-    return Checksum::RFC1071{_data.subspan(0, headerSize())}.isOk();
+    return Checksum::RFC1071(_data.subspan(0, headerSize())).isOk();
 }
 
 BytesSpan Packet::payload() const

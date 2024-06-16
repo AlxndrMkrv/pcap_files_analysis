@@ -45,16 +45,22 @@ set(CLANG_TIDY_ARGS
     perfomance-*
     readability-*
     -bugprone-reserved-identifier
+    -cppcoreguidelines-avoid-c-arrays
+    -cppcoreguidelines-avoid-const-or-ref-data-members
     -cppcoreguidelines-avoid-magic-numbers
+    -cppcoreguidelines-pro-type-member-init
+    -cppcoreguidelines-pro-type-union-access
     -cppcoreguidelines-non-private-member-variables-in-classes
     -cppcoreguidelines-pro-type-reinterpret-cast
     -cppcoreguidelines-special-member-functions
     -readability-avoid-const-params-in-decls
+    -readability-avoid-nested-conditional-operator
     -readability-braces-around-statements
     -readability-identifier-length
     -readability-magic-numbers
     -readability-simplify-boolean-expr
     -misc-include-cleaner
+    -misc-non-private-member-variables-in-classes
     -cert-dcl37-c
     -cert-dcl51-cpp
 )

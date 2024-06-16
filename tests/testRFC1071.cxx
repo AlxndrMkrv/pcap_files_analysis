@@ -8,7 +8,8 @@ bool testIPv4Headers()
             0x0c, 0x73, 0x5f, 0xd5, 0xb5, 0xa6, 0xc0, 0xa8, 0x06, 0x21};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{IPv4Header, sizeof(IPv4Header)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(IPv4Header),
+                         sizeof(IPv4Header)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 
@@ -22,7 +23,9 @@ bool testIPv4Headers()
             0x01, 0x02, 0x3c, 0x85, 0xc0, 0xa8, 0x06, 0xcc,
             0xe0, 0x00, 0x00, 0x16, 0x94, 0x04, 0x00, 0x00};
 
-        if (!Checksum::RFC1071{BytesSpan{IPv4Header, sizeof(IPv4Header)}}
+        if (!Checksum::RFC1071{
+                BytesSpan{static_cast<const uint8_t *>(IPv4Header),
+                          sizeof(IPv4Header)}}
                  .isOk())
             return false;
     }
@@ -41,7 +44,8 @@ bool testTCP4Headers()
             0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x07};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{PseudoHeaderTCP4, sizeof(PseudoHeaderTCP4)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(PseudoHeaderTCP4),
+                         sizeof(PseudoHeaderTCP4)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 
@@ -65,7 +69,8 @@ bool testUDP4Headers()
             0x75, 0x64, 0x00, 0x00, 0x01, 0x00, 0x01};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{UDP4Header, sizeof(UDP4Header)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(UDP4Header),
+                         sizeof(UDP4Header)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 
@@ -82,7 +87,8 @@ bool testUDP4Headers()
             0x73, 0x02, 0x72, 0x75, 0x00, 0x00, 0x01, 0x00, 0x01};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{UDP4Header, sizeof(UDP4Header)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(UDP4Header),
+                         sizeof(UDP4Header)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 
@@ -106,7 +112,8 @@ bool testICMP4Headers()
             0x00, 0x00, 0x00, 0x00, 0x01, 0x03, 0x03, 0x07};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{ICMP4Header, sizeof(ICMP4Header)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(ICMP4Header),
+                         sizeof(ICMP4Header)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 
@@ -128,7 +135,8 @@ bool testICMP6Headers()
             0x85, 0x00, 0x26, 0xe0, 0x00, 0x00, 0x00, 0x00};
 
         Checksum::RFC1071 rfc;
-        rfc += BytesSpan{PseudoHeaderICMP6, sizeof(PseudoHeaderICMP6)};
+        rfc += BytesSpan{static_cast<const uint8_t *>(PseudoHeaderICMP6),
+                         sizeof(PseudoHeaderICMP6)};
         const uint16_t little = rfc.little();
         const uint16_t big = rfc.big();
 

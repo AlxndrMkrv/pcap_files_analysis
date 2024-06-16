@@ -32,7 +32,7 @@ class Packet : public ::Packet::Base<Header> {
                   sizeof(PseudoHeader) == 10 * sizeof(uint32_t));
 
 public:
-    explicit Packet(const BytesSpan);
+    explicit Packet(const BytesSpan data);
 
     const Header & header() const;
     PseudoHeader pseudoHeader() const;

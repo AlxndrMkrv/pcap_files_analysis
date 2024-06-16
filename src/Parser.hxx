@@ -38,7 +38,7 @@ public:
     Reports && results();
 
 private:
-    void parse(Report & report);
+    void parse(Report & report) const;
     void threadLoop(const std::stop_token token);
 
     Filenames _files;

@@ -1,3 +1,4 @@
+#include "BytesSpan.hxx"
 #include "Packet/IPv4.hxx"
 #include "Packet/IPv6.hxx"
 
@@ -29,12 +30,16 @@ bool GeneratePseudoHeader()
                       sizeof(Dest) == sizeof(IPv6::Address) &&
                       sizeof(ValidPseudoHeader) == sizeof(IPv6::PseudoHeader));
 
-        const BytesSpan valid_phdr{ValidPseudoHeader,
-                                   sizeof(ValidPseudoHeader)};
-        const BytesSpan src_span{Source, sizeof(IPv6::Address)};
-        const BytesSpan dst_span{Dest, sizeof(IPv6::Address)};
+        const BytesSpan valid_phdr{
+            static_cast<BytesSpan::CByte *>(ValidPseudoHeader),
+            sizeof(ValidPseudoHeader)};
+        const BytesSpan src_span{static_cast<BytesSpan::CByte *>(Source),
+                                 sizeof(IPv6::Address)};
+        const BytesSpan dst_span{static_cast<BytesSpan::CByte *>(Dest),
+                                 sizeof(IPv6::Address)};
 
-        const IPv6::Packet pkt{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv6::Packet pkt{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
         const IPv6::PseudoHeader pseudo = pkt.pseudoHeader();
         const BytesSpan pseudo_span{reinterpret_cast<const uint8_t *>(&pseudo),
                                     sizeof(IPv6::PseudoHeader)};

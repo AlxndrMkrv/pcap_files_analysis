@@ -5,7 +5,9 @@
 
 namespace IPv4 {
 
-struct Address : ::Packet::Address<4> {};
+struct Address : ::Packet::Address<4> {
+    using ::Packet::Address<4>::Address;
+};
 
 struct Header {
     uint8_t Version : 4;
@@ -32,10 +34,10 @@ struct PseudoHeader {
 };
 
 namespace Protocol {
-enum { ICMP = 0x01, TCP = 0x06, UDP = 0x11, ICMP6 = 58 };
+enum : uint8_t { ICMP = 0x01, TCP = 0x06, UDP = 0x11, ICMP6 = 0x3A };
 } // namespace Protocol
 
-class Packet : public virtual ::Packet::Base<Header> {
+class Packet : public ::Packet::Base<Header> {
     static_assert(sizeof(Header) == 5 * sizeof(uint32_t) &&
                   sizeof(PseudoHeader) == 3 * sizeof(uint32_t));
 

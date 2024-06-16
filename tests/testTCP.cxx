@@ -16,14 +16,15 @@ bool FromIPv4()
                                                      0x3e, 0xd4, 0x40, 0x10,
                                                      0x00, 0x06, 0x00, 0x20};
 
-        const IPv4::Packet ipv4{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv4::Packet ipv4{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
 
         // refer to IPv4 tests if something goes wrong here
         if (!ipv4.isSane() || !ipv4.isChecksumOk() ||
             ipv4.protocol() != IPv4::Protocol::TCP)
             return false;
 
-        TCP::Packet tcp{ipv4.payload(), ipv4.pseudoHeader()};
+        const TCP::Packet tcp{ipv4.payload(), ipv4.pseudoHeader()};
 
         if (!tcp.isSane())
             return false;

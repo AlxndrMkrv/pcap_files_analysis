@@ -23,7 +23,7 @@ The program generates the following statistics for each PCAP file:
     * 256 - 511
     * 512 - 1023
     * 1024 - 1518
-    *  1519 <=
+    * \>= 1519
     
 4. **Distribution of packets by L3 protocols:**
     * IPv4

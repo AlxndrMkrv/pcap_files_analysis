@@ -1,7 +1,7 @@
 #pragma once
 
 #include "_Common.hxx"
-#include <iostream>
+#include <ostream>
 #include <unordered_map>
 
 namespace Statistics {
@@ -18,7 +18,7 @@ public:
         OTHER
     };
 
-    void update(const uint8_t protocol);
+    void update(const uint8_t flags);
 
     size_t value(const Category c) const;
 

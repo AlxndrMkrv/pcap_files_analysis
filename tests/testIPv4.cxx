@@ -15,10 +15,12 @@ bool GeneratePseudoHeader()
         static constexpr uint8_t ValidPseudoHeader[]{0xc0, 0xa8, 0x00, 0x0e,
                                                      0x3e, 0xd4, 0x40, 0x10,
                                                      0x00, 0x06, 0x00, 0x20};
-        const BytesSpan valid_phdr{ValidPseudoHeader,
-                                   sizeof(ValidPseudoHeader)};
+        const BytesSpan valid_phdr{
+            static_cast<const uint8_t *>(ValidPseudoHeader),
+            sizeof(ValidPseudoHeader)};
 
-        const IPv4::Packet pkt{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv4::Packet pkt{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
         const IPv4::PseudoHeader pseudo = pkt.pseudoHeader();
         const BytesSpan pseudo_span{reinterpret_cast<const uint8_t *>(&pseudo),
                                     sizeof(IPv4::PseudoHeader)};

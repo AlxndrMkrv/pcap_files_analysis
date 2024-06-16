@@ -1,9 +1,12 @@
 #include "Parser.hxx"
-#include <algorithm>
 #include <filesystem>
 #include <format>
 #include <iostream>
 #include <print>
+
+#ifndef __SINGLE_THREAD
+#include <algorithm>
+#endif
 
 #ifndef __PROGRAM_NAME
 #error "Program must be compiled with __PROGRAM_NAME defined"
@@ -15,13 +18,13 @@ namespace fs = std::filesystem;
 
 constexpr void terminate(const std::string_view message, const int exitCode = 0)
 {
-    exitCode ? std::cerr : std::cout << message << std::endl;
+    (exitCode == 0 ? std::cout : std::cerr) << message << std::endl;
     std::exit(exitCode);
 }
 
 int main(int argc, char * argv[])
 {
-    std::span<const char * const> args(argv, argc);
+    const std::span<const char * const> args(argv, argc);
 
     if (argc != 2)
         terminate(

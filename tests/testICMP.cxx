@@ -1,6 +1,8 @@
 #include "Packet/ICMP.hxx"
 #include "Packet/IPv4.hxx"
+#include "Packet/IPv6.hxx"
 
+namespace {
 bool FromIPv6()
 {
     {
@@ -12,7 +14,8 @@ bool FromIPv6()
             0x85, 0x00, 0x96, 0x31, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
             0x6a, 0x9a, 0x20, 0x37, 0xe9, 0xac};
 
-        IPv6::Packet ipv6{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv6::Packet ipv6{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
         const IPv6::PseudoHeader pseudo = ipv6.pseudoHeader();
         const BytesSpan pseudo_span{reinterpret_cast<const uint8_t *>(&pseudo),
                                     sizeof(IPv6::PseudoHeader)};
@@ -22,7 +25,7 @@ bool FromIPv6()
             ipv6.nextHeader() != IPv4::Protocol::ICMP6)
             return false;
 
-        ICMP::Packet icmp{ipv6.payload(), ipv6.pseudoHeader()};
+        const ICMP::Packet icmp{ipv6.payload(), ipv6.pseudoHeader()};
 
         if (!icmp.isSane())
             return false;
@@ -50,13 +53,14 @@ bool FromIPv4()
             0xb2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0xff, 0xff, 0x00, 0x00, 0x00, 0x00};
 
-        IPv4::Packet ipv4{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv4::Packet ipv4{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
 
         if (!ipv4.isSane() || !ipv4.isChecksumOk() ||
             ipv4.protocol() != IPv4::Protocol::ICMP)
             return false;
 
-        ICMP::Packet icmp{ipv4.payload()};
+        const ICMP::Packet icmp{ipv4.payload()};
 
         if (!icmp.isSane())
             return false;
@@ -67,6 +71,7 @@ bool FromIPv4()
 
     return true;
 }
+} // namespace
 
 int main()
 {

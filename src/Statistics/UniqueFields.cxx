@@ -2,79 +2,114 @@
 
 namespace Statistics {
 
+class UniqueFields::Getter {
+public:
+    template <typename TSet, class TValue>
+    static void update(UniqueFields & obj, const Category cat,
+                       const TValue & val)
+    {
+        if (!obj._counters.contains(cat))
+            Log::Fatal(std::format("Container for category {} is uninitialized",
+                                   std::to_underlying(cat)));
+
+        TSet * const set = std::get_if<TSet>(&obj._counters[cat]);
+
+        if (set == nullptr) {
+            Log::Fatal(std::format("Container for category {} is uninitialized",
+                                   std::to_underlying(cat)));
+            return; // Suppress cppcheck warning
+        }
+
+        set->insert(val);
+    }
+
+    template <typename TSet>
+    static size_t elementsNumber(const UniqueFields & obj, const Category cat)
+    {
+        if (!obj._counters.contains(cat))
+            Log::Fatal(std::format("Container for category {} is uninitialized",
+                                   std::to_underlying(cat)));
+
+        const TSet * const set = std::get_if<TSet>(&obj._counters.at(cat));
+
+        if (set == nullptr) {
+            Log::Fatal(std::format("Container for category {} is uninitialized",
+                                   std::to_underlying(cat)));
+            return 0; // Suppress cppcheck warning
+        }
+
+        return set->size();
+    }
+};
+
 UniqueFields::UniqueFields() :
-    _counters{{Category::SOURCE_MAC, std::set<Ethernet::Address>()},
-              {Category::DESTINATION_MAC, std::set<Ethernet::Address>()},
-              {Category::SOURCE_IPV4, std::set<IPv4::Address>()},
-              {Category::DESTINATION_IPV4, std::set<IPv4::Address>()},
-              {Category::SOURCE_IPV6, std::set<IPv6::Address>()},
-              {Category::DESTINATION_IPV6, std::set<IPv6::Address>()},
-              {Category::SOURCE_PORT, std::set<uint16_t>()},
-              {Category::DESTINATION_PORT, std::set<uint16_t>()}}
+    _counters{{Category::SOURCE_MAC, SetOfEthernetAddresses{}},
+              {Category::DESTINATION_MAC, SetOfEthernetAddresses{}},
+              {Category::SOURCE_IPV4, SetOfIPv4Addresses{}},
+              {Category::DESTINATION_IPV4, SetOfIPv4Addresses{}},
+              {Category::SOURCE_IPV6, SetOfIPv6Addresses{}},
+              {Category::DESTINATION_IPV6, SetOfIPv6Addresses{}},
+              {Category::SOURCE_PORT, SetOfPorts{}},
+              {Category::DESTINATION_PORT, SetOfPorts{}}}
 {
 }
 
 void UniqueFields::update(const Ethernet::Packet & packet)
 {
-    std::get<std::set<Ethernet::Address>>(_counters.at(Category::SOURCE_MAC))
-        .insert(packet.source());
-    std::get<std::set<Ethernet::Address>>(
-        _counters.at(Category::DESTINATION_MAC))
-        .insert(packet.destination());
+    Getter::update<SetOfEthernetAddresses>(*this, Category::SOURCE_MAC,
+                                           packet.source());
+    Getter::update<SetOfEthernetAddresses>(*this, Category::DESTINATION_MAC,
+                                           packet.destination());
 }
 
 void UniqueFields::update(const IPv4::Packet & packet)
 {
-    std::get<std::set<IPv4::Address>>(_counters.at(Category::SOURCE_IPV4))
-        .insert(packet.source());
-    std::get<std::set<IPv4::Address>>(_counters.at(Category::DESTINATION_IPV4))
-        .insert(packet.destination());
+    Getter::update<SetOfIPv4Addresses>(*this, Category::SOURCE_IPV4,
+                                       packet.source());
+    Getter::update<SetOfIPv4Addresses>(*this, Category::DESTINATION_IPV4,
+                                       packet.destination());
 }
 
 void UniqueFields::update(const IPv6::Packet & packet)
 {
-    std::get<std::set<IPv6::Address>>(_counters.at(Category::SOURCE_IPV6))
-        .insert(packet.source());
-    std::get<std::set<IPv6::Address>>(_counters.at(Category::DESTINATION_IPV6))
-        .insert(packet.destination());
+    Getter::update<SetOfIPv6Addresses>(*this, Category::SOURCE_IPV6,
+                                       packet.source());
+    Getter::update<SetOfIPv6Addresses>(*this, Category::DESTINATION_IPV6,
+                                       packet.destination());
 }
 
 void UniqueFields::update(const TCP::Packet & packet)
 {
-    std::get<std::set<uint16_t>>(_counters.at(Category::SOURCE_PORT))
-        .insert(packet.source());
-    std::get<std::set<uint16_t>>(_counters.at(Category::DESTINATION_PORT))
-        .insert(packet.destination());
+    Getter::update<SetOfPorts>(*this, Category::SOURCE_PORT, packet.source());
+    Getter::update<SetOfPorts>(*this, Category::DESTINATION_PORT,
+                               packet.destination());
 }
 
 void UniqueFields::update(const UDP::Packet & packet)
 {
-    std::get<std::set<uint16_t>>(_counters.at(Category::SOURCE_PORT))
-        .insert(packet.source());
-    std::get<std::set<uint16_t>>(_counters.at(Category::DESTINATION_PORT))
-        .insert(packet.destination());
+    Getter::update<SetOfPorts>(*this, Category::SOURCE_PORT, packet.source());
+    Getter::update<SetOfPorts>(*this, Category::DESTINATION_PORT,
+                               packet.destination());
 }
 
 size_t UniqueFields::value(const Category c) const
 {
-    if (!_counters.contains(c))
-        return 0;
-
     switch (c) {
     case Category::SOURCE_MAC:
     case Category::DESTINATION_MAC:
-        return std::get<std::set<Ethernet::Address>>(_counters.at(c)).size();
+        return Getter::elementsNumber<SetOfEthernetAddresses>(*this, c);
     case Category::SOURCE_IPV4:
     case Category::DESTINATION_IPV4:
-        return std::get<std::set<IPv4::Address>>(_counters.at(c)).size();
+        return Getter::elementsNumber<SetOfIPv4Addresses>(*this, c);
     case Category::SOURCE_IPV6:
     case Category::DESTINATION_IPV6:
-        return std::get<std::set<IPv6::Address>>(_counters.at(c)).size();
+        return Getter::elementsNumber<SetOfIPv6Addresses>(*this, c);
     case Category::SOURCE_PORT:
     case Category::DESTINATION_PORT:
-        return std::get<std::set<uint16_t>>(_counters.at(c)).size();
+        return Getter::elementsNumber<SetOfPorts>(*this, c);
     default:
-        return 0;
+        Log::Fatal(std::format("Unknown category {}", std::to_underlying(c)));
+        return 0; // suppress warning
     }
 }
 

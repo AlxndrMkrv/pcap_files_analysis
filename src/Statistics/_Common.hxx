@@ -1,12 +1,13 @@
 #pragma once
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
 namespace Statistics {
 
-static constexpr char ItemIndent[] = "    ";
-static constexpr char SectionIndent[] = "        ";
+static constexpr const char * ItemIndent = "    ";
+static constexpr const char * SectionIndent = "        ";
 
 template <typename T>
 concept EnumClass =
@@ -14,10 +15,7 @@ concept EnumClass =
 
 template <EnumClass T>
 struct EnumHash {
-    std::size_t operator()(const T & key) const
-    {
-        return std::to_underlying(key);
-    }
+    size_t operator()(const T & key) const { return std::to_underlying(key); }
 };
 
 } // namespace Statistics

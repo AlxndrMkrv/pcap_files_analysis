@@ -75,11 +75,12 @@ void Parser::threadLoop(const std::stop_token token)
     }
 }
 
-void Parser::parse(Report & report)
+void Parser::parse(Report & report) const
 {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t * handle = pcap_open_offline(
-        std::format("{}/{}", _directory, report.filename()).c_str(), errbuf);
+        std::format("{}/{}", _directory, report.filename()).c_str(),
+        static_cast<char *>(errbuf));
 
     if (handle == nullptr) {
         report.markInvalid();
@@ -88,8 +89,6 @@ void Parser::parse(Report & report)
 
     pcap_pkthdr * header = nullptr;
     const uint8_t * data = nullptr;
-    size_t packetCount = 0;
-    size_t byteCount = 0;
     int retValue = 0;
     size_t idx = 0;
 

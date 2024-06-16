@@ -13,14 +13,15 @@ bool FromIPv4()
             0x08, 0x6b, 0x65, 0x65, 0x6e, 0x65, 0x74, 0x69, 0x63, 0x05,
             0x63, 0x6c, 0x6f, 0x75, 0x64, 0x00, 0x00, 0x01, 0x00, 0x01};
 
-        const IPv4::Packet ipv4{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv4::Packet ipv4{
+            BytesSpan{static_cast<const uint8_t *>(Dump), sizeof(Dump)}};
 
         // refer to IPv4 tests if something fails here
         if (!ipv4.isSane() || !ipv4.isChecksumOk() ||
             ipv4.protocol() != IPv4::Protocol::UDP)
             return false;
 
-        UDP::Packet udp{ipv4.payload(), ipv4.pseudoHeader()};
+        const UDP::Packet udp{ipv4.payload(), ipv4.pseudoHeader()};
 
         if (!udp.isSane())
             return false;
@@ -46,14 +47,15 @@ bool FromIPv4()
             0x2d, 0x73, 0x06, 0x73, 0x6b, 0x79, 0x64, 0x6e, 0x73, 0x02, 0x72,
             0x75, 0x00, 0x00, 0x01, 0x00, 0x01};
 
-        const IPv4::Packet ipv4{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv4::Packet ipv4{
+            BytesSpan{static_cast<BytesSpan::CByte *>(Dump), sizeof(Dump)}};
 
         // refer to IPv4 tests if something fails here
         if (!ipv4.isSane() || !ipv4.isChecksumOk() ||
             ipv4.protocol() != IPv4::Protocol::UDP)
             return false;
 
-        UDP::Packet udp{ipv4.payload(), ipv4.pseudoHeader()};
+        const UDP::Packet udp{ipv4.payload(), ipv4.pseudoHeader()};
 
         if (!udp.isSane())
             return false;
@@ -91,14 +93,15 @@ bool FromIPv6()
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0x00, 0x0c, 0x00,
             0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-        const IPv6::Packet ipv6{BytesSpan{Dump, sizeof(Dump)}};
+        const IPv6::Packet ipv6{
+            BytesSpan{static_cast<const uint8_t *>(Dump), sizeof(Dump)}};
 
         // refer to IPv6 tests if something fails here
         if (!ipv6.isSane() || !ipv6.isChecksumOk() ||
             ipv6.nextHeader() != IPv4::Protocol::UDP)
             return false;
 
-        UDP::Packet udp{ipv6.payload(), ipv6.pseudoHeader()};
+        const UDP::Packet udp{ipv6.payload(), ipv6.pseudoHeader()};
 
         if (!udp.isSane())
             return false;

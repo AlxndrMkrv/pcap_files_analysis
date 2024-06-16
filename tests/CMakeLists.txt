@@ -8,17 +8,17 @@ function(add_test_ NAME SOURCE)
     get_filename_component(TARGET ${SOURCE} NAME_WE)
 
     add_executable(${TARGET} EXCLUDE_FROM_ALL ${SOURCE})
-    target_link_libraries(${TARGET} PRIVATE ${P_DEPS} bytespan)
+    target_link_libraries(${TARGET} PRIVATE ${P_DEPS} bytespan checksum)
     add_test(NAME ${NAME} COMMAND ${TARGET})
 
     add_dependencies(tests ${TARGET})
 endfunction()
 
 
-add_test_("RFC1071 checksum" testRFC1071.cxx DEPS checksums)
-add_test_("IPv4" testIPv4.cxx DEPS packets checksums)
-add_test_("IPv6" testIPv6.cxx DEPS packets checksums)
-add_test_("TCP" testTCP.cxx DEPS packets checksums)
-add_test_("ICMP" testICMP.cxx DEPS packets checksums)
-add_test_("UDP" testUDP.cxx DEPS packets checksums)
+add_test_("RFC1071 checksum" testRFC1071.cxx)
+add_test_("IPv4" testIPv4.cxx DEPS packets)
+add_test_("IPv6" testIPv6.cxx DEPS packets)
+add_test_("TCP" testTCP.cxx DEPS packets)
+add_test_("ICMP" testICMP.cxx DEPS packets)
+add_test_("UDP" testUDP.cxx DEPS packets)
 

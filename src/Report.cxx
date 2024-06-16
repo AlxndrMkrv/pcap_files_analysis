@@ -7,15 +7,14 @@
 
 constexpr const char * ItemIndent = Statistics::ItemIndent;
 
-#ifdef __IGNORE_INSANE
-#define HANDLE_INSANITY(pkt) return
-#else
-#define HANDLE_INSANITY(pkt)                                                   \
-    {                                                                          \
-        (pkt).print(std::cerr);                                                \
-        Fatal(std::format("^^^^ Insane packet found in \"{}\"", _filename));   \
-    }
+constexpr void HandleInsanity(const ::Packet::Abstract & pkt,
+                              std::string_view filename)
+{
+#ifndef __IGNORE_INSANE
+    pkt.print(std::cerr);
+    Log::Fatal(std::format("^^^^ Insane packet found in \"{}\"", filename));
 #endif
+}
 
 Report::Report(const std::filesystem::path & filename) : _filename(filename) {}
 
@@ -30,10 +29,10 @@ void Report::analysePacket(const BytesSpan data)
 
     _lengthDistribution.update(data.size());
 
-    Ethernet::Packet pkt{data};
+    const Ethernet::Packet pkt{data};
 
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt)
+        HandleInsanity(pkt, _filename);
 
     _uniqueFields.update(pkt);
     _l3Distribution.update(pkt.etherType());
@@ -45,13 +44,15 @@ void Report::analysePacket(const BytesSpan data)
     case Ethernet::EtherType::IPV6:
         analyseIPv6(IPv6::Packet(pkt.payload()));
         break;
+    default:
+        break;
     }
 }
 
 void Report::analyseIPv4(const IPv4::Packet & pkt)
 {
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt);
+        HandleInsanity(pkt, _filename);
 
     _l4Distribution.update(pkt.protocol());
     _l3Valids.update(pkt);
@@ -67,13 +68,15 @@ void Report::analyseIPv4(const IPv4::Packet & pkt)
     case IPv4::Protocol::ICMP:
         analyseICMP(ICMP::Packet(pkt.payload()));
         break;
+    default:
+        break;
     }
 }
 
 void Report::analyseIPv6(const IPv6::Packet & pkt)
 {
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt);
+        HandleInsanity(pkt, _filename);
 
     _l4Distribution.update(pkt.nextHeader());
     _l3Valids.update(pkt);
@@ -89,13 +92,15 @@ void Report::analyseIPv6(const IPv6::Packet & pkt)
     case IPv4::Protocol::ICMP6:
         analyseICMP(ICMP::Packet{pkt.payload(), pkt.pseudoHeader()});
         break;
+    default:
+        break;
     }
 }
 
 void Report::analyseICMP(const ICMP::Packet & pkt)
 {
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt);
+        HandleInsanity(pkt, _filename);
 
     _l4Valids.update(pkt);
 }
@@ -103,7 +108,7 @@ void Report::analyseICMP(const ICMP::Packet & pkt)
 void Report::analyseTCP(const TCP::Packet & pkt)
 {
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt);
+        HandleInsanity(pkt, _filename);
 
     _uniqueFields.update(pkt);
     _tcpFlags.update(pkt.flags());
@@ -113,7 +118,7 @@ void Report::analyseTCP(const TCP::Packet & pkt)
 void Report::analyseUDP(const UDP::Packet & pkt)
 {
     if (!pkt.isSane())
-        HANDLE_INSANITY(pkt);
+        HandleInsanity(pkt, _filename);
 
     _uniqueFields.update(pkt);
     _l4Valids.update(pkt);

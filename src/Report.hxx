@@ -10,8 +10,10 @@
 #include <filesystem>
 
 class Report {
+    friend std::ostream & operator<<(std::ostream & os, const Report & obj);
+
 public:
-    Report(const std::filesystem::path & filename);
+    explicit Report(const std::filesystem::path & filename);
 
     void markInvalid();
     const std::string & filename() const;
@@ -24,9 +26,6 @@ private:
     void analyseTCP(const TCP::Packet & pkt);
     void analyseUDP(const UDP::Packet & pkt);
 
-    friend std::ostream & operator<<(std::ostream & os, const Report & obj);
-
-private:
     std::string _filename;
     bool _fileInvalid = false;
     size_t _nPackets = 0;
