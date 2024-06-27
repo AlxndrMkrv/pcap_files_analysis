@@ -75,12 +75,24 @@ void Parser::threadLoop(const std::stop_token token)
     }
 }
 
+struct PcapDeleter {
+    void operator()(pcap_t * handle) const
+    {
+        if (handle != nullptr) {
+            pcap_close(handle);
+        }
+    }
+};
+
+using PcapHandle = std::unique_ptr<pcap_t, PcapDeleter>;
+
 void Parser::parse(Report & report) const
 {
-    char errbuf[PCAP_ERRBUF_SIZE];
-    pcap_t * handle = pcap_open_offline(
+    std::array<char, PCAP_ERRBUF_SIZE> errbuf;
+
+    const PcapHandle handle{pcap_open_offline(
         std::format("{}/{}", _directory, report.filename()).c_str(),
-        static_cast<char *>(errbuf));
+        static_cast<char *>(errbuf.begin()))};
 
     if (handle == nullptr) {
         report.markInvalid();
@@ -92,7 +104,7 @@ void Parser::parse(Report & report) const
     int retValue = 0;
     size_t idx = 0;
 
-    while ((retValue = pcap_next_ex(handle, &header, &data)) >= 0) {
+    while ((retValue = pcap_next_ex(handle.get(), &header, &data)) >= 0) {
         ++idx;
         if (header->caplen != header->len) {
             std::cerr << std::format("{}: skipping packet No. {}. {} bytes of "
@@ -107,6 +119,4 @@ void Parser::parse(Report & report) const
 
     if (retValue != PCAP_ERROR_BREAK)
         report.markInvalid();
-
-    pcap_close(handle);
 }
